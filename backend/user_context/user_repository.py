@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+from bson import ObjectId
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
 from fastapi.security.oauth2 import OAuth2PasswordBearer
@@ -80,11 +81,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 async def create_user(user : UserInRegister):
     hashed_password = get_password_hash(user.password)
 
-    new_user_credentials = UserInDB(email = user.email,type = user.type, hashed_password = hashed_password)
+    id = ObjectId()
+    new_user_credentials = UserInDB(_id = id, email = user.email,type = user.type, hashed_password = hashed_password)
     #new user profile for the relevant type 
-    result = await UserDB.insert_one(new_user_credentials.dict())
     #await UserProfilesDB.insert_one(new_user_profile.dict())
-    return result
+    result = await UserDB.insert_one(new_user_credentials.dict())
+    if result.acknowledged == True:
+        return str(result.inserted_id)
+    else:
+        raise Exception ("something went wrong but developer was too lazy so log it") 
+
+
+    
 
 
 

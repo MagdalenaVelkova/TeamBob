@@ -4,12 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
-from user_context.domain import Token, User, UserInRegister
+from user_context.domain import Token, User, UserInRegister, UserTypeEnum
 from user_context.user_repository import (authenticate_user,
                                           create_access_token, create_user,
                                           get_current_user)
 
-user_context = APIRouter(prefix="/api/authentication")
+user_context = APIRouter(prefix="/api")
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
@@ -32,12 +32,17 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 # View profile
-@user_context.get("/user/myprofile/", response_model=User)
+@user_context.get("/profile", response_model=User)
 async def get_my_profile(current_user: User = Depends(get_current_user)):
     return current_user
 
 # Register User
 @user_context.post("/register")
 async def register(user : UserInRegister):
-    result = await create_user(user)
-    return str(result)
+    try:
+        # FE will remember the id returned here and the type of user to display the next log in page
+        credentials_id = await create_user(user)
+        return {"id" : credentials_id, "user_type" : user.type}
+    except Exception as e:
+        print(e)
+

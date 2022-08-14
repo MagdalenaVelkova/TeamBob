@@ -5,9 +5,10 @@ from pydantic.main import BaseModel
 
 
 class Charity(BaseModel):
-    id: str = uuid4().hex
     name : str
     charity_id : str
     description : str
     verified : bool
 
+class CharityInDb(Charity):
+    credentials_id : str

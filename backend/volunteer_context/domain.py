@@ -1,17 +1,20 @@
 from datetime import datetime
+from typing import Dict
 from uuid import uuid4
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
-class TimePeriod():
+class TimePeriod(Dict):
     start : datetime
     end : datetime
 
-class Charity(BaseModel):
-    id: str = uuid4().hex
+class Volunteer(BaseModel):
     first_name : str
     last_name : str
     eligability : bool
-    hair_length : float
+    hair_length : int
     donation_timeframe : TimePeriod
+
+class VolunteerInDb(Volunteer):
+    credentials_id : str
