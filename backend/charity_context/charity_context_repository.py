@@ -11,6 +11,6 @@ async def create_charity(charity : Charity, id):
     entity = CharityInDb(credentials_id = id, name = charity.name,charity_id = charity.charity_id, description = charity.description, verified = charity.verified )
     result = await Charities.insert_one(entity.dict())
     if result.acknowledged == True:
-        return str(result.inserted_id)
+        return {"credentials_id" : id}
     else:
         raise Exception ("Something went wrong but developer was too lazy so log it") 
